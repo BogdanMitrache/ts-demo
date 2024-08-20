@@ -11,6 +11,11 @@ jobs:
     runs-on: windows-latest
     name: Build Aip Demo
     steps:
+      - name: Azure login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.JSON_LOGIN }}
+          enable-AzPSSession: true  
       - name: Setup .NET Core SDK 
         uses: actions/setup-dotnet@v3
         with:
