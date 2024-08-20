@@ -1,10 +1,20 @@
 name: Build Advanced Installer Project (.AIP)  Demo
 on: [workflow_dispatch]
+
+env:
+  AZURE_TENANT_ID: ${{ secrets.SECRETS_TENANTID }}
+  AZURE_CLIENT_ID: ${{ secrets.SECRETS_CLIENTID }}
+  AZURE_CLIENT_SECRET: ${{ secrets.SECRETS_CLIENTSECRET }}
+          
 jobs:
   advinst-aip-build-demo:
     runs-on: windows-latest
     name: Build Aip Demo
     steps:
+      - name: Setup .NET Core SDK 
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0'
       - name: Check out repository code
         uses: actions/checkout@v2
       - name: Build AIP
