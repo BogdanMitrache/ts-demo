@@ -23,7 +23,7 @@ jobs:
           advinst-version: '21.9'
           advinst-license: ${{ secrets.ADVINST_LICENSE_KEY }}
           advinst-enable-automation: 'true'
-          aip-path: ${{ github.workspace }}\SetupPackage\MsixTroubleshooterSetup.aip
+          aip-path: ${{ github.workspace }}\SetupPackage\MSIX Troubleshooter.aip
           aip-build-name: DefaultBuild
           aip-package-name: MSIX Troubleshooter.msi
           aip-output-dir:  ${{ github.workspace }}\SetupPackage\MSIX Troubleshooter-SetupFiles
