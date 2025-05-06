@@ -30,7 +30,7 @@ jobs:
           aip-output-dir:  ${{ github.workspace }}\SetupPackage\MSIX Troubleshooter-SetupFiles
         
       - name: Publish setup artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@main
         with:
           name: MSIX Troubleshooter
           path: ${{ github.workspace }}\SetupPackage\MSIX Troubleshooter-SetupFiles\MSIX Troubleshooter.msi
