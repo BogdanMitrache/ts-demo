@@ -28,7 +28,7 @@ jobs:
           endpoint: https://neu.codesigning.azure.net/
           trusted-signing-account-name: CaphyonDigitalSignature
           certificate-profile-name: Test-ACS
-          files-folder: ${{ github.workspace }}\MSIX TroubleShooter\My Project
+          files-folder: ${{ github.workspace }}\\SetupPackage
           files-folder-filter: exe
           files-folder-recurse: true
           file-digest: SHA256
