@@ -23,7 +23,7 @@ jobs:
         uses: azure/trusted-signing-action@v0
         with:
           azure-tenant-id: ${{ secrets.SECRETS_TENANTID }}
-          azure-client-id: ${{ secrets.SECRET_CLIENTID }}
+          azure-client-id: ${{ secrets.SECRETS_CLIENTID }}
           azure-client-secret: ${{ secrets.SECRETS_CLIENTSECRET }}
           endpoint: https://neu.codesigning.azure.net/
           trusted-signing-account-name: CaphyonDigitalSignature
