@@ -8,7 +8,7 @@ env:
 
 jobs:
   advinst-aip-build-demo:
-    runs-on: windows-latest
+    runs-on: windows-2022
     name: Build Aip Demo
     steps:
    
