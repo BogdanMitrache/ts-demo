@@ -18,10 +18,29 @@ jobs:
           dotnet-version: '8.0'
       - name: Check out repository code
         uses: actions/checkout@v2
+        
+      - name: Sign executables with Trusted Signing
+        uses: azure/trusted-signing-action@v0
+        with:
+          azure-tenant-id: ${{ secrets.SECRETS_TENANTID }}
+          azure-client-id: ${{ secrets.SECRET_CLIENTID }}
+          azure-client-secret: ${{ secrets.SECRETS_CLIENTSECRET }}
+          endpoint: https://neu.codesigning.azure.net/
+          trusted-signing-account-name: CaphyonDigitalSignature
+          certificate-profile-name: Test-ACS
+          files-folder: ${{ github.workspace }}\MSIX TroubleShooter\My Project
+          files-folder-filter: exe
+          files-folder-recurse: true
+          file-digest: SHA256
+          timestamp-rfc3161: http://timestamp.acs.microsoft.com
+          timestamp-digest: SHA256
+      
+    # === SIGNING STEPS END HERE ===
+        
       - name: Build AIP
         uses: caphyon/advinst-github-action@main
         with:
-          advinst-version: '22.0'
+          advinst-version: '23.3'
           advinst-license: ${{ secrets.ADVINST_LICENSE_KEY }}
           advinst-enable-automation: 'true'
           aip-path: ${{ github.workspace }}\SetupPackage\MSIX Troubleshooter.aip
