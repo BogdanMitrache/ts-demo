@@ -47,7 +47,7 @@ jobs:
         uses: caphyon/advinst-github-action@main
         with:
           advinst-version: '23.3'
-          advinst-license: ${{ secrets.ADVINST_LICENSE_KEY }}
+          advinst-license: ${{ secrets.ADVINST_LICENSE_KEY_DEBUG }}
           advinst-enable-automation: 'true'
           aip-path: ${{ github.workspace }}\SetupPackage\MSIX Troubleshooter.aip
           aip-build-name: DefaultBuild
