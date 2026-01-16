@@ -20,29 +20,45 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v2
 
-      - name: Azure Login
-        uses: azure/login@v2
-        with:
-          creds: '{"clientId":"${{ secrets.SECRETS_CLIENTID }}","clientSecret":"${{ secrets.SECRETS_CLIENTSECRET }}","subscriptionId":"${{ secrets.AZURE_SUBSCRIPTION_ID }}","tenantId":"${{ secrets.SECRETS_TENANTID }}"}'
-        
-      - name: Sign executables with Trusted Signing
-        uses: azure/trusted-signing-action@v0
-        with:
-          azure-tenant-id: ${{ secrets.SECRETS_TENANTID }}
-          azure-client-id: ${{ secrets.SECRETS_CLIENTID }}
-          azure-client-secret: ${{ secrets.SECRETS_CLIENTSECRET }}
-          endpoint: https://neu.codesigning.azure.net/
-          trusted-signing-account-name: CaphyonDigitalSignature
-          certificate-profile-name: Test-ACS
-          files-folder: ${{ github.workspace }}\\SetupPackage
-          files-folder-filter: exe
-          files-folder-recurse: true
-          file-digest: SHA256
-          timestamp-rfc3161: http://timestamp.acs.microsoft.com
-          timestamp-digest: SHA256
-      
-    # === SIGNING STEPS END HERE ===______________________________________________
-        
+
+      - name: Download and Admin Install Trusted Signing Client Tools
+        shell: powershell
+        run: |
+          $DownloadUrl = "https://download.microsoft.com/download/6d9cb638-4d5f-438d-9f21-23f0f4405944/TrustedSigningClientTools.msi"
+          $DownloadPath = "$env:TEMP\TrustedSigningClientTools.msi"
+          $AdminInstallBaseDir = "$env:ProgramData\Caphyon\Advanced Installer\TrustedSigningClientTools"
+          
+          Write-Host "Downloading Trusted Signing Client Tools..."
+          Invoke-WebRequest -Uri $DownloadUrl -OutFile $DownloadPath -UseBasicParsing
+          
+          Write-Host "Reading MSI product version..."
+          $windowsInstaller = New-Object -ComObject WindowsInstaller.Installer
+          $database = $windowsInstaller.GetType().InvokeMember("OpenDatabase", "InvokeMethod", $null, $windowsInstaller, @($DownloadPath, 0))
+          $view = $database.GetType().InvokeMember("OpenView", "InvokeMethod", $null, $database, ("SELECT Value FROM Property WHERE Property='ProductVersion'"))
+          $view.GetType().InvokeMember("Execute", "InvokeMethod", $null, $view, $null)
+          $record = $view.GetType().InvokeMember("Fetch", "InvokeMethod", $null, $view, $null)
+          $productVersion = $record.GetType().InvokeMember("StringData", "GetProperty", $null, $record, 1)
+          
+          [System.Runtime.Interopservices.Marshal]::ReleaseComObject($record) | Out-Null
+          [System.Runtime.Interopservices.Marshal]::ReleaseComObject($view) | Out-Null
+          [System.Runtime.Interopservices.Marshal]::ReleaseComObject($database) | Out-Null
+          [System.Runtime.Interopservices.Marshal]::ReleaseComObject($windowsInstaller) | Out-Null
+          [System.GC]::Collect()
+          
+          if ([string]::IsNullOrEmpty($productVersion)) { $productVersion = "1.0.0" }
+          
+          $adminTargetDir = Join-Path $AdminInstallBaseDir $productVersion
+          New-Item -ItemType Directory -Path $adminTargetDir -Force | Out-Null
+          
+          Write-Host "Performing admin install to: $adminTargetDir"
+          $process = Start-Process -FilePath "msiexec.exe" -ArgumentList @("/a", "`"$DownloadPath`"", "/qr", "TARGETDIR=`"$adminTargetDir`"") -Wait -PassThru -NoNewWindow
+          
+          if ($process.ExitCode -ne 0) {
+            throw "Admin install failed with exit code: $($process.ExitCode)"
+          }
+          
+          Write-Host "Admin install completed successfully"
+          
       - name: Build AIP
         uses: caphyon/advinst-github-action@main
         with:
